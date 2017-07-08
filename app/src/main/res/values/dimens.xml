@@ -5,4 +5,5 @@
     <dimen name="layout_small_margin">8dp</dimen>
 
     <dimen name="item_offset">8dp</dimen>
+    <dimen name="button_padding">16dp</dimen>
 </resources>

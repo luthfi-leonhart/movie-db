@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/colorAccentHighlight">
+
+    <item>
+        <shape>
+            <solid android:color="@color/colorAccent" />
+            <corners android:radius="@dimen/cardview_default_radius" />
+        </shape>
+    </item>
+
+    <item android:id="@android:id/mask">
+        <shape>
+            <solid android:color="@color/colorAccentHighlight" />
+            <corners android:radius="@dimen/cardview_default_radius" />
+        </shape>
+    </item>
+
+</ripple>

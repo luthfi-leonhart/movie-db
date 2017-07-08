@@ -13,7 +13,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.loopj.android.http.RequestParams;
 import com.upwardproject.moviedb.BuildConfig;
@@ -26,6 +25,7 @@ import com.upwardproject.moviedb.ui.ItemClickListener;
 import com.upwardproject.moviedb.ui.movie.MovieContract;
 import com.upwardproject.moviedb.ui.movie.MovieFilter;
 import com.upwardproject.moviedb.ui.movie.detail.MovieDetailFragment;
+import com.upwardproject.moviedb.ui.widget.EmptyRecyclerView;
 import com.upwardproject.moviedb.ui.widget.ItemOffsetDecoration;
 import com.upwardproject.moviedb.util.ActivityUtil;
 import com.upwardproject.moviedb.util.network.NetworkUtil;
@@ -56,7 +56,10 @@ public class MovieListFragment extends BaseListFragment implements MovieContract
 
         toolbar = (Toolbar) view.findViewById(R.id.toolbar);
         srlRefresh = (SwipeRefreshLayout) view.findViewById(R.id.refresh);
-        rvList = (RecyclerView) view.findViewById(R.id.list);
+        rvList = (EmptyRecyclerView) view.findViewById(R.id.list);
+
+        View emptyView = view.findViewById(R.id.empty_view);
+        initEmptyView(emptyView);
 
         return view;
     }
@@ -92,7 +95,7 @@ public class MovieListFragment extends BaseListFragment implements MovieContract
     @Override
     public void loadData() {
         if (!NetworkUtil.isNetworkConnected(getContext())) {
-            Toast.makeText(getContext(), R.string.error_network_unavailable, Toast.LENGTH_SHORT).show();
+            showConnectionError();
             return;
         }
 

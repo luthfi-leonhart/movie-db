@@ -5,17 +5,18 @@ import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.Toast;
 
 import com.upwardproject.moviedb.R;
+import com.upwardproject.moviedb.ui.widget.EmptyRecyclerView;
+import com.upwardproject.moviedb.ui.widget.EmptyViewHolder;
 import com.upwardproject.moviedb.ui.widget.EndlessRecyclerViewOnScrollListener;
 
 public abstract class BaseListFragment extends BaseFragment implements BaseContract.RemoteView, SwipeRefreshLayout.OnRefreshListener {
-    protected final int LIMIT = 50;
     private final String PARAM_PAGE = "page";
 
     protected SwipeRefreshLayout srlRefresh;
-    protected RecyclerView rvList;
+    protected EmptyRecyclerView rvList;
+    protected EmptyViewHolder emptyViewHolder;
 
     protected int pageToLoad = 1;
     protected BaseListAdapter adapter;
@@ -45,6 +46,14 @@ public abstract class BaseListFragment extends BaseFragment implements BaseContr
                 }
             });
         }
+
+        emptyViewHolder.setClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                emptyViewHolder.hide();
+                loadData();
+            }
+        });
     }
 
     @Override
@@ -65,24 +74,25 @@ public abstract class BaseListFragment extends BaseFragment implements BaseContr
 
     protected void showConnectionError() {
         if (isAdded()) {
-            rvList.setVisibility(View.GONE);
+            emptyViewHolder.setMessage(R.string.error_network_unavailable);
+            rvList.setAsEmpty();
             setProgressIndicator(false);
-            Toast.makeText(getContext(), R.string.error_network_unavailable, Toast.LENGTH_SHORT).show();
         }
     }
 
     @Override
     public void showEmpty(String message) {
         if (isAdded() && pageToLoad == 1) {
-            rvList.setVisibility(View.GONE);
-            Toast.makeText(getContext(), message != null ? message : getString(R.string.error_data_not_found), Toast.LENGTH_SHORT).show();
+            emptyViewHolder.setMessage(message != null ? message : getString(R.string.error_data_not_found));
+            rvList.setAsEmpty();
         }
     }
 
     @Override
     public void showError() {
         if (isAdded()) {
-            Toast.makeText(getContext(), R.string.error_loading_failed, Toast.LENGTH_SHORT).show();
+            emptyViewHolder.setMessage(R.string.error_loading_failed);
+            rvList.setAsEmpty();
         }
     }
 
@@ -91,6 +101,13 @@ public abstract class BaseListFragment extends BaseFragment implements BaseContr
         super.onSaveInstanceState(outState);
 
         outState.putInt(PARAM_PAGE, pageToLoad);
+    }
+
+    protected void initEmptyView(View v) {
+        if (v != null) {
+            rvList.setEmptyView(v);
+            emptyViewHolder = new EmptyViewHolder(v);
+        }
     }
 
     public abstract void loadData();
