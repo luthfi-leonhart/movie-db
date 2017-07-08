@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="layout_large_margin">24dp</dimen>
+    <dimen name="layout_general_margin">16dp</dimen>
+    <dimen name="layout_small_margin">8dp</dimen>
+
+    <dimen name="item_offset">8dp</dimen>
+</resources>

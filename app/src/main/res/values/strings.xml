@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Movie DB</string>
+
+    <string name="error_data_not_found">Data not found</string>
+    <string name="error_email_not_valid">Input appropriate email</string>
+    <string name="error_loading_failed">Loading failed, try again.</string>
+    <string name="error_must_not_empty">Must not empty</string>
+    <string name="error_network_unavailable">Connection error. Check and try again.</string>
+    <string name="error_password_not_match">confirmed password doesn\'t match</string>
+    <string name="error_send_data_failed">Sending data failed, try again</string>
+
+    <string name="movie_sort_popular">Popular</string>
+    <string name="movie_sort_top_rated">Top Rated</string>
+    <string name="movie_title_popular">Popular Movies</string>
+    <string name="movie_title_top_rated">Top Rated Movies</string>
+    <string name="movie_release_date" formatted="false">Release date: %s</string>
+
+    <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum</string>
+    <string name="sort">Sort</string>
+
+</resources>
