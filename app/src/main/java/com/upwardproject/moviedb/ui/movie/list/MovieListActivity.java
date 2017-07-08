@@ -1,4 +1,4 @@
-package com.upwardproject.moviedb.ui.movie;
+package com.upwardproject.moviedb.ui.movie.list;
 
 import android.os.Bundle;
 
@@ -7,7 +7,7 @@ import com.upwardproject.moviedb.ui.BaseActivity;
 import com.upwardproject.moviedb.ui.movie.list.MovieListFragment;
 import com.upwardproject.moviedb.util.ActivityUtil;
 
-public class MovieActivity extends BaseActivity {
+public class MovieListActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -91,11 +91,4 @@ public class MovieDetailFragment extends Fragment {
         tvOverview.setText(movie.getOverview());
     }
 
-//
-//    @Override
-//    public void onSaveInstanceState(Bundle outState) {
-//        super.onSaveInstanceState(outState);
-//        outState.putParcelableArrayList(PARAM_LIST, mItemList);
-//    }
-
 }

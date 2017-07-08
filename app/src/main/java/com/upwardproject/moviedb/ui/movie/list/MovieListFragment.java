@@ -24,6 +24,7 @@ import com.upwardproject.moviedb.ui.BaseListFragment;
 import com.upwardproject.moviedb.ui.ItemClickListener;
 import com.upwardproject.moviedb.ui.movie.MovieContract;
 import com.upwardproject.moviedb.ui.movie.MovieFilter;
+import com.upwardproject.moviedb.ui.movie.detail.MovieDetailActivity;
 import com.upwardproject.moviedb.ui.movie.detail.MovieDetailFragment;
 import com.upwardproject.moviedb.ui.widget.EmptyRecyclerView;
 import com.upwardproject.moviedb.ui.widget.ItemOffsetDecoration;
@@ -52,7 +53,7 @@ public class MovieListFragment extends BaseListFragment implements MovieContract
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_list, container, false);
+        View view = inflater.inflate(R.layout.activity_list, container, false);
 
         toolbar = (Toolbar) view.findViewById(R.id.toolbar);
         srlRefresh = (SwipeRefreshLayout) view.findViewById(R.id.refresh);
@@ -130,9 +131,10 @@ public class MovieListFragment extends BaseListFragment implements MovieContract
     public void onItemClicked(View view, Object data, int position) {
         Movie movie = (Movie) data;
 
-        ActivityUtil.replaceFragment(getFragmentManager(),
-                MovieDetailFragment.newInstance(movie),
-                R.id.container);
+        startActivity(MovieDetailActivity.newInstance(getContext(), movie));
+//        ActivityUtil.replaceFragment(getFragmentManager(),
+//                MovieDetailFragment.newInstance(movie),
+//                R.id.container);
     }
 
     @Override
