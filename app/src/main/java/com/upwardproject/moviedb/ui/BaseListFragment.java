@@ -75,6 +75,7 @@ public abstract class BaseListFragment extends BaseFragment implements BaseContr
     protected void showConnectionError() {
         if (isAdded()) {
             emptyViewHolder.setMessage(R.string.error_network_unavailable);
+            emptyViewHolder.setIcon(R.drawable.ic_network_off);
             rvList.setAsEmpty();
             setProgressIndicator(false);
         }
@@ -84,6 +85,7 @@ public abstract class BaseListFragment extends BaseFragment implements BaseContr
     public void showEmpty(String message) {
         if (isAdded() && pageToLoad == 1) {
             emptyViewHolder.setMessage(message != null ? message : getString(R.string.error_data_not_found));
+            emptyViewHolder.setIcon(R.drawable.ic_empty);
             rvList.setAsEmpty();
         }
     }
@@ -92,6 +94,7 @@ public abstract class BaseListFragment extends BaseFragment implements BaseContr
     public void showError() {
         if (isAdded()) {
             emptyViewHolder.setMessage(R.string.error_loading_failed);
+            emptyViewHolder.setIcon(R.drawable.ic_error);
             rvList.setAsEmpty();
         }
     }

@@ -25,10 +25,8 @@ import com.upwardproject.moviedb.ui.ItemClickListener;
 import com.upwardproject.moviedb.ui.movie.MovieContract;
 import com.upwardproject.moviedb.ui.movie.MovieFilter;
 import com.upwardproject.moviedb.ui.movie.detail.MovieDetailActivity;
-import com.upwardproject.moviedb.ui.movie.detail.MovieDetailFragment;
 import com.upwardproject.moviedb.ui.widget.EmptyRecyclerView;
 import com.upwardproject.moviedb.ui.widget.ItemOffsetDecoration;
-import com.upwardproject.moviedb.util.ActivityUtil;
 import com.upwardproject.moviedb.util.network.NetworkUtil;
 
 import java.util.ArrayList;
