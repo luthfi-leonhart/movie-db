@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimaryDark">
@@ -50,15 +51,15 @@
                 android:id="@+id/movie_title_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Title"
-                android:textAppearance="@style/Base.TextAppearance.AppCompat.Title" />
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Title"
+                tools:text="Title" />
 
             <TextView
                 android:id="@+id/movie_release_date_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/layout_small_margin"
-                android:text="Release date" />
+                tools:text="Release date" />
 
             <TextView
                 android:id="@+id/movie_vote_average_tv"
@@ -66,8 +67,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/layout_small_margin"
                 android:drawablePadding="4dp"
+                android:drawableRight="@drawable/ic_star"
                 android:gravity="center_vertical"
-                android:text="4.2" />
+                tools:text="4.2" />
 
             <TextView
                 android:id="@+id/movie_overview_tv"
@@ -75,7 +77,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/layout_general_margin"
                 android:lineSpacingMultiplier="1.3"
-                android:text="@string/lorem_ipsum" />
+                tools:text="@string/lorem_ipsum" />
 
         </LinearLayout>
 

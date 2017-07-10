@@ -11,8 +11,8 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.upwardproject.moviedb.R;
 import com.upwardproject.moviedb.constant.MovieDbApi;
 import com.upwardproject.moviedb.model.Movie;
-import com.upwardproject.moviedb.ui.BaseListAdapter;
 import com.upwardproject.moviedb.ui.ItemClickListener;
+import com.upwardproject.moviedb.ui.BaseListAdapter;
 
 import java.util.List;
 
@@ -20,9 +20,8 @@ import java.util.List;
  * Created by Dark on 04/03/2017.
  */
 
-class MovieListAdapter extends BaseListAdapter {
+class MovieListAdapter extends BaseListAdapter<RecyclerView.ViewHolder> {
     private List<Movie> mItemList;
-    private ItemClickListener mListener;
 
     MovieListAdapter(List<Movie> itemList, ItemClickListener listener) {
         mItemList = itemList;
