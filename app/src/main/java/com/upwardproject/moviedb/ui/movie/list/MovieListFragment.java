@@ -130,9 +130,6 @@ public class MovieListFragment extends BaseListFragment implements MovieContract
         Movie movie = (Movie) data;
 
         startActivity(MovieDetailActivity.newInstance(getContext(), movie));
-//        ActivityUtil.replaceFragment(getFragmentManager(),
-//                MovieDetailFragment.newInstance(movie),
-//                R.id.container);
     }
 
     @Override

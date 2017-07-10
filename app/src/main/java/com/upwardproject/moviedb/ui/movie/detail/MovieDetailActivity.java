@@ -18,11 +18,17 @@ import com.upwardproject.moviedb.model.Movie;
 import com.upwardproject.moviedb.ui.BaseActivity;
 import com.upwardproject.moviedb.util.LDate;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class MovieDetailActivity extends BaseActivity {
 
-    private Toolbar toolbar;
-    private ImageView ivBackdrop;
-    private TextView tvTitle, tvReleaseDate, tvVoteAverage, tvOverview;
+    @BindView(R.id.toolbar) Toolbar toolbar;
+    @BindView(R.id.movie_backdrop_iv) ImageView ivBackdrop;
+    @BindView(R.id.movie_title_tv) TextView tvTitle;
+    @BindView(R.id.movie_release_date_tv) TextView tvReleaseDate;
+    @BindView(R.id.movie_vote_average_tv) TextView tvVoteAverage;
+    @BindView(R.id.movie_overview_tv) TextView tvOverview;
 
     private Movie movie;
 
@@ -37,13 +43,7 @@ public class MovieDetailActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_movie_detail);
-
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        ivBackdrop = (ImageView) findViewById(R.id.movie_backdrop_iv);
-        tvTitle = (TextView) findViewById(R.id.movie_title_tv);
-        tvReleaseDate = (TextView) findViewById(R.id.movie_release_date_tv);
-        tvVoteAverage = (TextView) findViewById(R.id.movie_vote_average_tv);
-        tvOverview = (TextView) findViewById(R.id.movie_overview_tv);
+        ButterKnife.bind(this);
 
         setToolbar(toolbar, null);
         ActionBar ab = getSupportActionBar();
