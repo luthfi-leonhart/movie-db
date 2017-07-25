@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:orientation="vertical"
+    android:padding="@dimen/layout_small_margin">
+
+    <ImageView
+        android:id="@+id/movie_video_thumbnail_iv"
+        android:layout_width="@dimen/video_thumbnail_width"
+        android:layout_height="@dimen/video_thumbnail_height"
+        android:background="@drawable/bg_border"
+        android:contentDescription="@string/movie_video_thumbnail"
+        android:padding="@dimen/layout_general_margin"
+        app:srcCompat="@drawable/ic_play" />
+
+    <TextView
+        android:id="@+id/movie_video_title_tv"
+        android:layout_width="@dimen/video_thumbnail_width"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/layout_small_margin"
+        android:ellipsize="end"
+        android:maxLines="2"
+        tools:text="Video with a very very long title" />
+
+</LinearLayout>

@@ -16,12 +16,9 @@
 
     <TextView
         android:id="@+id/empty_message_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        style="@style/EmptyTextStyle"
         android:layout_marginTop="@dimen/layout_general_margin"
-        tools:text="This is empty view"
-        android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
-        android:textColor="@android:color/white" />
+        tools:text="This is empty view" />
 
     <Button
         android:id="@+id/empty_button"

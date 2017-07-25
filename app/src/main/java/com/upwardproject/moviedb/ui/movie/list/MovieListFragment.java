@@ -32,11 +32,17 @@ import com.upwardproject.moviedb.util.network.NetworkUtil;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
+
 public class MovieListFragment extends BaseListFragment implements MovieContract.ListView,
         ItemClickListener {
+    // TODO add favorite order
     private static final String PARAM_LIST = "movie_list";
 
-    private Toolbar toolbar;
+    @BindView(R.id.toolbar) Toolbar toolbar;
+    private Unbinder unbinder;
 
     private ArrayList<Movie> mItemList;
     private MovieListPresenter mPresenter;
@@ -51,11 +57,8 @@ public class MovieListFragment extends BaseListFragment implements MovieContract
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.activity_list, container, false);
-
-        toolbar = (Toolbar) view.findViewById(R.id.toolbar);
-        srlRefresh = (SwipeRefreshLayout) view.findViewById(R.id.refresh);
-        rvList = (EmptyRecyclerView) view.findViewById(R.id.list);
+        View view = inflater.inflate(R.layout.fragment_list, container, false);
+        unbinder = ButterKnife.bind(this, view);
 
         View emptyView = view.findViewById(R.id.empty_view);
         initEmptyView(emptyView);
@@ -189,4 +192,9 @@ public class MovieListFragment extends BaseListFragment implements MovieContract
         outState.putParcelableArrayList(PARAM_LIST, mItemList);
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
+    }
 }

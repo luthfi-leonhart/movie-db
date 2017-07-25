@@ -1,10 +1,11 @@
 package com.upwardproject.moviedb.model;
 
+import android.content.ContentUris;
 import android.content.Context;
 
 import com.loopj.android.http.RequestParams;
 import com.upwardproject.moviedb.constant.MovieDbApi;
-import com.upwardproject.moviedb.ui.movie.MovieFilter;
+import com.upwardproject.moviedb.util.JSONParser;
 import com.upwardproject.moviedb.util.network.JsonDataReceiver;
 import com.upwardproject.moviedb.util.network.RemoteCallback;
 import com.upwardproject.moviedb.util.network.ServerRestClient;
@@ -16,22 +17,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Dark on 08/07/2017.
+ * Created by Dark on 25/07/2017.
  */
 
-public class MovieRepository {
-    public static void list(Context context, int filter, RequestParams params, final RemoteCallback.Load<List<Movie>> callback) {
-        String url;
-        switch (filter) {
-            case MovieFilter.POPULAR:
-                url = MovieDbApi.popularMoviesUrl;
-                break;
-            case MovieFilter.TOP_RATED:
-                url = MovieDbApi.topRatedMoviesUrl;
-                break;
-            default:
-                url = MovieDbApi.popularMoviesUrl;
-        }
+public class MovieVideoRepository {
+
+    public static void list(Context context, int id, RequestParams params, final RemoteCallback.Load<List<MovieVideo>> callback) {
+        String url = ContentUris.withAppendedId(MovieDbApi.BASE_MOVIE_URI, id)
+                .buildUpon()
+                .appendPath(MovieDbApi.PATH_PARAM_VIDEOS)
+                .toString();
 
         ServerRestClient.get(context, url, params, new JsonDataReceiver() {
             @Override
@@ -43,7 +38,7 @@ public class MovieRepository {
                     return;
                 }
 
-                List<Movie> itemList = new ArrayList<>();
+                List<MovieVideo> itemList = new ArrayList<>();
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject jsonObject = jsonArray.optJSONObject(i);
                     itemList.add(getDataFromJson(jsonObject));
@@ -64,17 +59,12 @@ public class MovieRepository {
         });
     }
 
-    public static Movie getDataFromJson(JSONObject jsonObject) {
+    public static MovieVideo getDataFromJson(JSONObject jsonObject) {
         if (jsonObject == null) return null;
 
-        return new Movie(jsonObject.optInt("id"), jsonObject.optString("title"), jsonObject.optString("original_title"))
-                .setPosterPath(jsonObject.optString("poster_path"))
-                .setBackdropPath(jsonObject.optString("backdrop_path"))
-                .setOverview(jsonObject.optString("overview"))
-                .setReleaseDate(jsonObject.optString("release_date"))
-                .setVoteCount(jsonObject.optInt("vote_count"))
-                .setVoteAverage(jsonObject.optDouble("vote_average"))
-                .setPopularity(jsonObject.optDouble("popularity"));
+        return new MovieVideo(JSONParser.optString(jsonObject, "id"),
+                JSONParser.optString(jsonObject, "key"),
+                JSONParser.optString(jsonObject, "name"));
     }
 
 }

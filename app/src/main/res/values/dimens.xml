@@ -4,6 +4,9 @@
     <dimen name="layout_general_margin">16dp</dimen>
     <dimen name="layout_small_margin">8dp</dimen>
 
-    <dimen name="item_offset">8dp</dimen>
+    <dimen name="video_thumbnail_width">154dp</dimen>
+    <dimen name="video_thumbnail_height">100dp</dimen>
+
+    <dimen name="item_offset">2dp</dimen>
     <dimen name="button_padding">16dp</dimen>
 </resources>

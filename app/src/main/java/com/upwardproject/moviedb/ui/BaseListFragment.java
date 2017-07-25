@@ -11,11 +11,13 @@ import com.upwardproject.moviedb.ui.widget.EmptyRecyclerView;
 import com.upwardproject.moviedb.ui.widget.EmptyViewHolder;
 import com.upwardproject.moviedb.ui.widget.EndlessRecyclerViewOnScrollListener;
 
+import butterknife.BindView;
+
 public abstract class BaseListFragment extends BaseFragment implements BaseContract.RemoteView, SwipeRefreshLayout.OnRefreshListener {
     private final String PARAM_PAGE = "page";
 
-    protected SwipeRefreshLayout srlRefresh;
-    protected EmptyRecyclerView rvList;
+    @BindView(R.id.refresh) protected SwipeRefreshLayout srlRefresh;
+    @BindView(R.id.list) protected EmptyRecyclerView rvList;
     protected EmptyViewHolder emptyViewHolder;
 
     protected int pageToLoad = 1;

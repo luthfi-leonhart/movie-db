@@ -20,7 +20,7 @@ import java.util.List;
  * Created by Dark on 04/03/2017.
  */
 
-class MovieListAdapter extends BaseListAdapter<RecyclerView.ViewHolder> {
+class MovieListAdapter extends BaseListAdapter<Movie> {
     private List<Movie> mItemList;
 
     MovieListAdapter(List<Movie> itemList, ItemClickListener listener) {
