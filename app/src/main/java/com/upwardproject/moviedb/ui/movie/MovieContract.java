@@ -1,7 +1,6 @@
 package com.upwardproject.moviedb.ui.movie;
 
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
+import android.database.Cursor;
 
 import com.loopj.android.http.RequestParams;
 import com.upwardproject.moviedb.model.Movie;
@@ -19,8 +18,6 @@ import java.util.List;
 public class MovieContract {
     public interface ListView extends BaseContract.RemoteView{
         void onMovieListLoaded(List<Movie> movies);
-
-        CursorLoader getFavoriteMovieLoader(LoaderManager.LoaderCallbacks callbacks);
     }
 
     public interface ListAction extends BasePresenter<ListView>{
@@ -28,7 +25,9 @@ public class MovieContract {
 
         int getFilter();
 
-        void loadMovies(int filter, RequestParams params);
+        void loadMoviesFromRemote(int filter, RequestParams params);
+
+        void loadMoviesFromLocal(Cursor cursor);
     }
 
     public interface DetailView{

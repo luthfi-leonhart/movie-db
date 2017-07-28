@@ -2,11 +2,13 @@ package com.upwardproject.moviedb.ui.movie.list;
 
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -40,7 +42,8 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
 public class MovieListFragment extends BaseListFragment implements MovieContract.ListView,
-        ItemClickListener {
+        ItemClickListener,
+        LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String PARAM_LIST = "movie_list";
 
@@ -57,7 +60,7 @@ public class MovieListFragment extends BaseListFragment implements MovieContract
         setHasOptionsMenu(true);
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getContext());
-        mPresenter = new MovieListPresenter(sp, getLoaderManager());
+        mPresenter = new MovieListPresenter(sp);
         mPresenter.attachView(this);
     }
 
@@ -129,9 +132,16 @@ public class MovieListFragment extends BaseListFragment implements MovieContract
 
     @Override
     public void loadData() {
-        if (mPresenter.getFilter() == MovieFilter.FAVORITE && pageToLoad > 1) {
+        int filter = mPresenter.getFilter();
+
+        if (filter == MovieFilter.FAVORITE) {
             // No need to load another data for favorites, because we already retrieved them all
-            pageToLoad = 1;
+            if (pageToLoad > 1) {
+                pageToLoad = 1;
+                return;
+            }
+
+            getLoaderManager().initLoader(DatabaseContract.MovieEntry.ID_FAVORITE_MOVIES_LOADER, null, this);
             return;
         }
 
@@ -144,7 +154,7 @@ public class MovieListFragment extends BaseListFragment implements MovieContract
         params.put(MovieDbApi.PARAM_API_KEY, BuildConfig.MOVIEDB_API_KEY);
         params.put(MovieDbApi.PARAM_PAGE, pageToLoad);
 
-        mPresenter.loadMovies(mPresenter.getFilter(), params);
+        mPresenter.loadMoviesFromRemote(mPresenter.getFilter(), params);
     }
 
     @Override
@@ -186,16 +196,6 @@ public class MovieListFragment extends BaseListFragment implements MovieContract
         Movie movie = (Movie) data;
 
         startActivity(MovieDetailActivity.newInstance(getContext(), movie));
-    }
-
-    @Override
-    public CursorLoader getFavoriteMovieLoader(LoaderManager.LoaderCallbacks callbacks) {
-        return new CursorLoader(getContext(),
-                DatabaseContract.MovieEntry.CONTENT_URI,
-                null,
-                null,
-                null,
-                null);
     }
 
     @Override
@@ -267,6 +267,27 @@ public class MovieListFragment extends BaseListFragment implements MovieContract
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
-        mPresenter.detachView();
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        setProgressIndicator(true);
+
+        return new CursorLoader(getContext(),
+                DatabaseContract.MovieEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mPresenter.loadMoviesFromLocal(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
     }
 }

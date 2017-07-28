@@ -7,7 +7,9 @@ import android.database.Cursor;
 import android.net.Uri;
 
 import com.loopj.android.http.RequestParams;
+import com.upwardproject.moviedb.constant.MovieDbApi;
 import com.upwardproject.moviedb.data.DatabaseContract;
+import com.upwardproject.moviedb.ui.movie.MovieFilter;
 import com.upwardproject.moviedb.util.network.JsonDataReceiver;
 import com.upwardproject.moviedb.util.network.RemoteCallback;
 import com.upwardproject.moviedb.util.network.ServerRestClient;
@@ -23,7 +25,20 @@ import java.util.List;
  */
 
 public class MovieRepository {
-    public static void getListFromRemote(String url, RequestParams params, final RemoteCallback.Load<List<Movie>> callback) {
+
+    public static void getListFromRemote(int filter, RequestParams params, final RemoteCallback.Load<List<Movie>> callback) {
+        String url;
+        switch (filter) {
+            case MovieFilter.POPULAR:
+                url = MovieDbApi.popularMoviesUrl;
+                break;
+            case MovieFilter.TOP_RATED:
+                url = MovieDbApi.topRatedMoviesUrl;
+                break;
+            default:
+                throw new RuntimeException("Index movie filter " + filter + " not available for remote request");
+        }
+
         ServerRestClient.get(url, params, new JsonDataReceiver() {
             @Override
             public void onLoadingSucceed(Object data) {

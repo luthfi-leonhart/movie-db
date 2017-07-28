@@ -2,12 +2,8 @@ package com.upwardproject.moviedb.ui.movie.list;
 
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
 
 import com.loopj.android.http.RequestParams;
-import com.upwardproject.moviedb.constant.MovieDbApi;
 import com.upwardproject.moviedb.constant.Settings;
 import com.upwardproject.moviedb.model.Movie;
 import com.upwardproject.moviedb.model.MovieRepository;
@@ -24,15 +20,11 @@ import java.util.List;
 
 class MovieListPresenter implements MovieContract.ListAction {
 
-    private final int ID_FAVORITE_MOVIES_LOADER = 12;
-
     private MovieContract.ListView view;
     private SharedPreferences sp;
-    private LoaderManager loaderManager;
 
-    MovieListPresenter(SharedPreferences sp, LoaderManager loaderManager) {
+    MovieListPresenter(SharedPreferences sp) {
         this.sp = sp;
-        this.loaderManager = loaderManager;
     }
 
     @Override
@@ -52,10 +44,10 @@ class MovieListPresenter implements MovieContract.ListAction {
     }
 
     @Override
-    public void loadMovies(int filter, RequestParams params) {
+    public void loadMoviesFromRemote(int filter, RequestParams params) {
         view.setProgressIndicator(true);
 
-        RemoteCallback.Load<List<Movie>> callback = new RemoteCallback.Load<List<Movie>>() {
+        MovieRepository.getListFromRemote(filter, params, new RemoteCallback.Load<List<Movie>>() {
             @Override
             public void onDataLoaded(List<Movie> data) {
                 view.onMovieListLoaded(data);
@@ -73,55 +65,28 @@ class MovieListPresenter implements MovieContract.ListAction {
                 view.showEmpty(message);
                 view.setProgressIndicator(false);
             }
-        };
-
-        switch (filter) {
-            case MovieFilter.POPULAR:
-                MovieRepository.getListFromRemote(MovieDbApi.popularMoviesUrl, params, callback);
-                break;
-            case MovieFilter.TOP_RATED:
-                MovieRepository.getListFromRemote(MovieDbApi.topRatedMoviesUrl, params, callback);
-                break;
-            case MovieFilter.FAVORITE:
-                loadFavoriteMovies(callback);
-                break;
-            default:
-                throw new RuntimeException("Filter index not found");
-        }
+        });
     }
 
-    private void loadFavoriteMovies(final RemoteCallback.Load<List<Movie>> callback) {
-        loaderManager.initLoader(ID_FAVORITE_MOVIES_LOADER, null, new LoaderManager.LoaderCallbacks<Cursor>() {
-            @Override
-            public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-                if (id == ID_FAVORITE_MOVIES_LOADER) return view.getFavoriteMovieLoader(this);
+    @Override
+    public void loadMoviesFromLocal(Cursor cursor) {
+        if (cursor.getCount() == 0) {
+            view.showEmpty(null);
+            view.setProgressIndicator(false);
+            return;
+        }
 
-                throw new RuntimeException("Loader id " + id + " not found");
-            }
+        List<Movie> itemList = new ArrayList<>();
 
-            @Override
-            public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-                if (data.getCount() == 0) {
-                    callback.onDataNotAvailable(null);
-                    return;
-                }
+        if (cursor.getPosition() == cursor.getCount()) cursor.moveToPosition(-1);
 
-                List<Movie> itemList = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            Movie movie = MovieRepository.getCompleteDataFromCursor(cursor);
+            itemList.add(movie);
+        }
 
-                if (data.getPosition() == data.getCount()) data.moveToPosition(-1);
-
-                while (data.moveToNext()) {
-                    Movie movie = MovieRepository.getCompleteDataFromCursor(data);
-                    itemList.add(movie);
-                }
-
-                callback.onDataLoaded(itemList);
-            }
-
-            @Override
-            public void onLoaderReset(Loader<Cursor> loader) {
-            }
-        });
+        view.onMovieListLoaded(itemList);
+        view.setProgressIndicator(false);
     }
 
     @Override

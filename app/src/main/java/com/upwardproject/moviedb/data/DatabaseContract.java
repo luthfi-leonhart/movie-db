@@ -40,6 +40,8 @@ public class DatabaseContract {
 
     /* Inner class that defines the table contents of the movie table */
     public static final class MovieEntry implements BaseColumns {
+        /* Id for loader favorite movies */
+        public static final int ID_FAVORITE_MOVIES_LOADER = 12;
 
         /* The base CONTENT_URI used to query the movie table from the content provider */
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
