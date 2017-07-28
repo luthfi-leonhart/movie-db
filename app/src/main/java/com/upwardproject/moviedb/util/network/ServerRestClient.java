@@ -17,11 +17,20 @@ public class ServerRestClient {
 
     public static RequestHandle get(Context ctx, String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
         client.addHeader("Content-Type", "application/json");
-        return client.get(ctx, url, params, responseHandler);
+        return client.get(ctx, url, params, responseHandler).setTag("movie_reviews");
     }
 
     public static RequestHandle post(Context ctx, String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
         return client.post(ctx, url, params, responseHandler);
+    }
+
+    public static RequestHandle get(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
+        client.addHeader("Content-Type", "application/json");
+        return client.get(url, params, responseHandler);
+    }
+
+    public static RequestHandle post(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
+        return client.post(url, params, responseHandler);
     }
 
     public static void setTimeout(int timeout) {

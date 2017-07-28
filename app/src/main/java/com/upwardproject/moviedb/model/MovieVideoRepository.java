@@ -1,7 +1,6 @@
 package com.upwardproject.moviedb.model;
 
 import android.content.ContentUris;
-import android.content.Context;
 
 import com.loopj.android.http.RequestParams;
 import com.upwardproject.moviedb.constant.MovieDbApi;
@@ -22,13 +21,13 @@ import java.util.List;
 
 public class MovieVideoRepository {
 
-    public static void list(Context context, int id, RequestParams params, final RemoteCallback.Load<List<MovieVideo>> callback) {
+    public static void list(int id, RequestParams params, final RemoteCallback.Load<List<MovieVideo>> callback) {
         String url = ContentUris.withAppendedId(MovieDbApi.BASE_MOVIE_URI, id)
                 .buildUpon()
                 .appendPath(MovieDbApi.PATH_PARAM_VIDEOS)
                 .toString();
 
-        ServerRestClient.get(context, url, params, new JsonDataReceiver() {
+        ServerRestClient.get(url, params, new JsonDataReceiver() {
             @Override
             public void onLoadingSucceed(Object data) {
                 JSONArray jsonArray = ((JSONObject) data).optJSONArray("results");

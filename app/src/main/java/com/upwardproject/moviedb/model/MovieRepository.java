@@ -1,10 +1,13 @@
 package com.upwardproject.moviedb.model;
 
-import android.content.Context;
+import android.content.ContentResolver;
+import android.content.ContentUris;
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.net.Uri;
 
 import com.loopj.android.http.RequestParams;
-import com.upwardproject.moviedb.constant.MovieDbApi;
-import com.upwardproject.moviedb.ui.movie.MovieFilter;
+import com.upwardproject.moviedb.data.DatabaseContract;
 import com.upwardproject.moviedb.util.network.JsonDataReceiver;
 import com.upwardproject.moviedb.util.network.RemoteCallback;
 import com.upwardproject.moviedb.util.network.ServerRestClient;
@@ -20,20 +23,8 @@ import java.util.List;
  */
 
 public class MovieRepository {
-    public static void list(Context context, int filter, RequestParams params, final RemoteCallback.Load<List<Movie>> callback) {
-        String url;
-        switch (filter) {
-            case MovieFilter.POPULAR:
-                url = MovieDbApi.popularMoviesUrl;
-                break;
-            case MovieFilter.TOP_RATED:
-                url = MovieDbApi.topRatedMoviesUrl;
-                break;
-            default:
-                url = MovieDbApi.popularMoviesUrl;
-        }
-
-        ServerRestClient.get(context, url, params, new JsonDataReceiver() {
+    public static void getListFromRemote(String url, RequestParams params, final RemoteCallback.Load<List<Movie>> callback) {
+        ServerRestClient.get(url, params, new JsonDataReceiver() {
             @Override
             public void onLoadingSucceed(Object data) {
                 JSONArray jsonArray = ((JSONObject) data).optJSONArray("results");
@@ -64,7 +55,7 @@ public class MovieRepository {
         });
     }
 
-    public static Movie getDataFromJson(JSONObject jsonObject) {
+    private static Movie getDataFromJson(JSONObject jsonObject) {
         if (jsonObject == null) return null;
 
         return new Movie(jsonObject.optInt("id"), jsonObject.optString("title"), jsonObject.optString("original_title"))
@@ -77,4 +68,55 @@ public class MovieRepository {
                 .setPopularity(jsonObject.optDouble("popularity"));
     }
 
+    /*
+     * LOCAL
+     */
+
+    public static boolean isExistInLocal(ContentResolver resolver, int movieId) {
+        Uri uri = ContentUris.withAppendedId(DatabaseContract.MovieEntry.CONTENT_URI, movieId);
+        String[] projection = {DatabaseContract.MovieEntry._ID};
+
+        Cursor cursor = resolver.query(uri, projection, null, null, null);
+
+        if (cursor == null) return false;
+
+        boolean exist = cursor.getCount() == 1;
+        cursor.close();
+
+        return exist;
+    }
+
+    public static void saveToLocal(ContentResolver resolver, Movie movie) {
+        ContentValues values = new ContentValues();
+        values.put(DatabaseContract.MovieEntry._ID, movie.getId());
+        values.put(DatabaseContract.MovieEntry.COLUMN_TITLE, movie.getTitle());
+        values.put(DatabaseContract.MovieEntry.COLUMN_ORIGINAL_TITLE, movie.getOriginalTitle());
+        values.put(DatabaseContract.MovieEntry.COLUMN_POSTER_PATH, movie.getPosterPath());
+        values.put(DatabaseContract.MovieEntry.COLUMN_BACKDROP_PATH, movie.getBackdropPath());
+        values.put(DatabaseContract.MovieEntry.COLUMN_VOTE_COUNT, movie.getVoteCount());
+        values.put(DatabaseContract.MovieEntry.COLUMN_VOTE_AVG, movie.getVoteAverage());
+        values.put(DatabaseContract.MovieEntry.COLUMN_POPULARITY, movie.getPopularity());
+        values.put(DatabaseContract.MovieEntry.COLUMN_OVERVIEW, movie.getOverview());
+        values.put(DatabaseContract.MovieEntry.COLUMN_RELEASE_DATE, movie.getReleaseDate());
+
+        resolver.insert(DatabaseContract.MovieEntry.CONTENT_URI, values);
+    }
+
+    public static void deleteFromLocal(ContentResolver resolver, int movieId) {
+        Uri uri = ContentUris.withAppendedId(DatabaseContract.MovieEntry.CONTENT_URI, movieId);
+        resolver.delete(uri, null, null);
+    }
+
+    public static Movie getCompleteDataFromCursor(Cursor data) {
+        return new Movie(data.getInt(data.getColumnIndex(DatabaseContract.MovieEntry._ID)),
+                data.getString(data.getColumnIndex(DatabaseContract.MovieEntry.COLUMN_TITLE)),
+                data.getString(data.getColumnIndex(DatabaseContract.MovieEntry.COLUMN_ORIGINAL_TITLE)))
+                .setPosterPath(data.getString(data.getColumnIndex(DatabaseContract.MovieEntry.COLUMN_POSTER_PATH)))
+                .setBackdropPath(data.getString(data.getColumnIndex(DatabaseContract.MovieEntry.COLUMN_BACKDROP_PATH)))
+                .setOverview(data.getString(data.getColumnIndex(DatabaseContract.MovieEntry.COLUMN_OVERVIEW)))
+                .setReleaseDate(data.getString(data.getColumnIndex(DatabaseContract.MovieEntry.COLUMN_RELEASE_DATE)))
+                .setVoteCount(data.getInt(data.getColumnIndex(DatabaseContract.MovieEntry.COLUMN_VOTE_COUNT)))
+                .setVoteAverage(data.getDouble(data.getColumnIndex(DatabaseContract.MovieEntry.COLUMN_VOTE_AVG)))
+                .setPopularity(data.getDouble(data.getColumnIndex(DatabaseContract.MovieEntry.COLUMN_POPULARITY)));
+    }
 }

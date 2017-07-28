@@ -1,9 +1,12 @@
 package com.upwardproject.moviedb.ui.movie.list;
 
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -18,6 +21,7 @@ import com.loopj.android.http.RequestParams;
 import com.upwardproject.moviedb.BuildConfig;
 import com.upwardproject.moviedb.R;
 import com.upwardproject.moviedb.constant.MovieDbApi;
+import com.upwardproject.moviedb.data.DatabaseContract;
 import com.upwardproject.moviedb.model.Movie;
 import com.upwardproject.moviedb.ui.BaseActivity;
 import com.upwardproject.moviedb.ui.BaseListFragment;
@@ -25,7 +29,6 @@ import com.upwardproject.moviedb.ui.ItemClickListener;
 import com.upwardproject.moviedb.ui.movie.MovieContract;
 import com.upwardproject.moviedb.ui.movie.MovieFilter;
 import com.upwardproject.moviedb.ui.movie.detail.MovieDetailActivity;
-import com.upwardproject.moviedb.ui.widget.EmptyRecyclerView;
 import com.upwardproject.moviedb.ui.widget.ItemOffsetDecoration;
 import com.upwardproject.moviedb.util.network.NetworkUtil;
 
@@ -38,10 +41,11 @@ import butterknife.Unbinder;
 
 public class MovieListFragment extends BaseListFragment implements MovieContract.ListView,
         ItemClickListener {
-    // TODO add favorite order
+
     private static final String PARAM_LIST = "movie_list";
 
-    @BindView(R.id.toolbar) Toolbar toolbar;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
     private Unbinder unbinder;
 
     private ArrayList<Movie> mItemList;
@@ -52,7 +56,9 @@ public class MovieListFragment extends BaseListFragment implements MovieContract
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-        mPresenter = new MovieListPresenter(this);
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getContext());
+        mPresenter = new MovieListPresenter(sp, getLoaderManager());
+        mPresenter.attachView(this);
     }
 
     @Override
@@ -74,8 +80,20 @@ public class MovieListFragment extends BaseListFragment implements MovieContract
         rvList.addItemDecoration(new ItemOffsetDecoration(getContext(), R.dimen.item_offset));
 
         int filter = mPresenter.getFilter();
-        ((BaseActivity) getActivity()).setToolbar(toolbar,
-                filter == MovieFilter.POPULAR ? R.string.movie_title_popular : R.string.movie_title_top_rated);
+        int textResId = 0;
+        switch (filter) {
+            case MovieFilter.POPULAR:
+                textResId = R.string.movie_title_popular;
+                break;
+            case MovieFilter.TOP_RATED:
+                textResId = R.string.movie_title_top_rated;
+                break;
+            case MovieFilter.FAVORITE:
+                textResId = R.string.movie_title_favorite;
+                break;
+        }
+
+        ((BaseActivity) getActivity()).setToolbar(toolbar, textResId);
 
         if (savedInstanceState != null) {
             mItemList = savedInstanceState.getParcelableArrayList(PARAM_LIST);
@@ -91,11 +109,32 @@ public class MovieListFragment extends BaseListFragment implements MovieContract
         mPresenter.setFilter(filter);
         loadData();
 
-        getActivity().setTitle(filter == MovieFilter.POPULAR ? R.string.movie_title_popular : R.string.movie_title_top_rated);
+        int textResId;
+        switch (filter) {
+            case MovieFilter.POPULAR:
+                textResId = R.string.movie_title_popular;
+                break;
+            case MovieFilter.TOP_RATED:
+                textResId = R.string.movie_title_top_rated;
+                break;
+            case MovieFilter.FAVORITE:
+                textResId = R.string.movie_title_favorite;
+                break;
+            default:
+                throw new RuntimeException("Filter index not found");
+        }
+
+        getActivity().setTitle(textResId);
     }
 
     @Override
     public void loadData() {
+        if (mPresenter.getFilter() == MovieFilter.FAVORITE && pageToLoad > 1) {
+            // No need to load another data for favorites, because we already retrieved them all
+            pageToLoad = 1;
+            return;
+        }
+
         if (!NetworkUtil.isNetworkConnected(getContext())) {
             showConnectionError();
             return;
@@ -105,7 +144,7 @@ public class MovieListFragment extends BaseListFragment implements MovieContract
         params.put(MovieDbApi.PARAM_API_KEY, BuildConfig.MOVIEDB_API_KEY);
         params.put(MovieDbApi.PARAM_PAGE, pageToLoad);
 
-        mPresenter.loadMovies(params);
+        mPresenter.loadMovies(mPresenter.getFilter(), params);
     }
 
     @Override
@@ -122,6 +161,20 @@ public class MovieListFragment extends BaseListFragment implements MovieContract
         adapter.notifyDataSetChanged();
     }
 
+    @Override
+    public void showEmpty(String message) {
+        if (isAdded() && mPresenter.getFilter() == MovieFilter.FAVORITE) {
+            emptyViewHolder.setMessage(message != null ? message : getString(R.string.movie_favorite_empty));
+            emptyViewHolder.setIcon(R.drawable.ic_star_outline);
+            emptyViewHolder.showButton(false);
+            rvList.setAsEmpty();
+            return;
+        }
+
+        emptyViewHolder.showButton(true);
+        super.showEmpty(message);
+    }
+
     private void bindData() {
         adapter = new MovieListAdapter(mItemList, this);
         rvList.setAdapter(adapter);
@@ -133,6 +186,16 @@ public class MovieListFragment extends BaseListFragment implements MovieContract
         Movie movie = (Movie) data;
 
         startActivity(MovieDetailActivity.newInstance(getContext(), movie));
+    }
+
+    @Override
+    public CursorLoader getFavoriteMovieLoader(LoaderManager.LoaderCallbacks callbacks) {
+        return new CursorLoader(getContext(),
+                DatabaseContract.MovieEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null);
     }
 
     @Override
@@ -154,6 +217,9 @@ public class MovieListFragment extends BaseListFragment implements MovieContract
                 case MovieFilter.TOP_RATED:
                     menu.findItem(R.id.ac_sort_top_rated).setChecked(true);
                     break;
+                case MovieFilter.FAVORITE:
+                    menu.findItem(R.id.ac_sort_favorite).setChecked(true);
+                    break;
             }
         }
     }
@@ -167,6 +233,11 @@ public class MovieListFragment extends BaseListFragment implements MovieContract
                 break;
             case R.id.ac_sort_top_rated:
                 toggleFilter(MovieFilter.TOP_RATED);
+                item.setChecked(true);
+                break;
+            case R.id.ac_sort_favorite:
+                // TODO get favorite list
+                toggleFilter(MovieFilter.FAVORITE);
                 item.setChecked(true);
                 break;
         }
@@ -196,5 +267,6 @@ public class MovieListFragment extends BaseListFragment implements MovieContract
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+        mPresenter.detachView();
     }
 }

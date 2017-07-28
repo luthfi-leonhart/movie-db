@@ -2,20 +2,27 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/ac_sort"
-        android:title="@string/sort"
+    <item
+        android:id="@+id/ac_sort"
         android:icon="@drawable/ic_sort"
+        android:title="@string/sort"
         app:showAsAction="always">
 
         <menu>
 
             <group android:checkableBehavior="single">
 
-                <item android:id="@+id/ac_sort_popular"
-                    android:title="@string/movie_sort_popular"/>
+                <item
+                    android:id="@+id/ac_sort_popular"
+                    android:title="@string/movie_sort_popular" />
 
-                <item android:id="@+id/ac_sort_top_rated"
-                    android:title="@string/movie_sort_top_rated"/>
+                <item
+                    android:id="@+id/ac_sort_top_rated"
+                    android:title="@string/movie_sort_top_rated" />
+
+                <item
+                    android:id="@+id/ac_sort_favorite"
+                    android:title="@string/movie_sort_favorite" />
 
             </group>
 

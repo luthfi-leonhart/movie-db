@@ -17,7 +17,10 @@
     <TextView
         android:id="@+id/empty_message_tv"
         style="@style/EmptyTextStyle"
+        android:layout_marginEnd="@dimen/layout_general_margin"
+        android:layout_marginStart="@dimen/layout_general_margin"
         android:layout_marginTop="@dimen/layout_general_margin"
+        android:gravity="center_horizontal"
         tools:text="This is empty view" />
 
     <Button

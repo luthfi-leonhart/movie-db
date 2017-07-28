@@ -10,13 +10,18 @@
     <string name="error_password_not_match">confirmed password doesn\'t match</string>
     <string name="error_send_data_failed">Sending data failed, try again</string>
 
+    <string name="movie_favorite_empty">Put your favorite movies here to make it easier to find!</string>
+    <string name="movie_favorite_remove">Remove as favorite</string>
+    <string name="movie_favorite_set">Set as favorite</string>
     <string name="movie_poster">Poster</string>
     <string name="movie_release_date">Release date</string>
     <string name="movie_reviews">Reviews</string>
     <string name="movie_reviews_empty">No one has yet to review</string>
     <string name="movie_reviews_error">Error in loading reviews, click to try again</string>
+    <string name="movie_sort_favorite">Favorite</string>
     <string name="movie_sort_popular">Popular</string>
     <string name="movie_sort_top_rated">Top Rated</string>
+    <string name="movie_title_favorite">Favorite Movies</string>
     <string name="movie_title_popular">Popular Movies</string>
     <string name="movie_title_top_rated">Top Rated Movies</string>
     <string name="movie_video_thumbnail">Video\'s thumbnail</string>
@@ -24,8 +29,11 @@
     <string name="movie_videos_empty">No videos available yet</string>
     <string name="movie_videos_error">Error in loading videos, click to try again</string>
 
-    <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum</string>
+    <string name="today">Today</string>
+    <string name="tomorrow">Tomorrow</string>
     <string name="try_again">Try Again</string>
     <string name="sort">Sort</string>
+
+    <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum</string>
 
 </resources>

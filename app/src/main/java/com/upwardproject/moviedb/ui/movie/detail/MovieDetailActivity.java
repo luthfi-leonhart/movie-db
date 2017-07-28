@@ -4,12 +4,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.design.widget.AppBarLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.TypedValue;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -36,16 +40,20 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MovieDetailActivity extends BaseActivity implements MovieContract.DetailView {
-    // TODO add favorite button
+
     private static final String PARAM_REVIEWS = "reviews";
     private static final String PARAM_REVIEWS_STATE = "reviews_state";
     private static final String PARAM_VIDEOS = "videos";
     private static final String PARAM_VIDEOS_STATE = "videos_state";
 
+    @BindView(R.id.appbar)
+    AppBarLayout appBarLayout;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     @BindView(R.id.movie_backdrop_iv)
     ImageView ivBackdrop;
+    @BindView(R.id.movie_favorite_iv)
+    ImageView ivFavorite;
     @BindView(R.id.movie_title_tv)
     TextView tvTitle;
     @BindView(R.id.movie_release_date_tv)
@@ -67,11 +75,15 @@ public class MovieDetailActivity extends BaseActivity implements MovieContract.D
     @BindView(R.id.movie_reviews_rv)
     RecyclerView rvReviews;
 
+    private MenuItem itemFavorite;
+
     private MovieDetailPresenter mPresenter;
 
     private Movie mMovie;
     private ArrayList<MovieVideo> mVideos;
     private ArrayList<MovieReview> mReviews;
+
+    private int actionBarHeight;
 
     public static Intent newInstance(Context context, Movie movie) {
         Intent intent = new Intent(context, MovieDetailActivity.class);
@@ -86,7 +98,15 @@ public class MovieDetailActivity extends BaseActivity implements MovieContract.D
         setContentView(R.layout.activity_movie_detail);
         ButterKnife.bind(this);
 
-        mPresenter = new MovieDetailPresenter(this);
+        mPresenter = new MovieDetailPresenter(getContentResolver());
+        mPresenter.attachView(this);
+
+        // Calculate ActionBar height
+        TypedValue tv = new TypedValue();
+        if (getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+            actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
+        }
+
         initViews();
 
         if (getIntent().hasExtra(Movie.PARAM_MODEL)) {
@@ -99,14 +119,42 @@ public class MovieDetailActivity extends BaseActivity implements MovieContract.D
                 loadReviews(mMovie.getId());
             }
         }
+
+        toggleFavoriteIcon();
     }
 
-    private void initViews(){
+    private void initViews() {
         setToolbar(toolbar, null);
         ActionBar ab = getSupportActionBar();
         if (ab != null) {
             ab.setDisplayHomeAsUpEnabled(true);
         }
+
+        appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+            boolean isShown = false;
+            int scrollRange = -1;
+
+            @Override
+            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                if (scrollRange == -1) {
+                    scrollRange = appBarLayout.getTotalScrollRange();
+                }
+                if (scrollRange + verticalOffset > actionBarHeight) {
+                    if (itemFavorite != null) itemFavorite.setVisible(false);
+                    isShown = false;
+                } else if (!isShown) {
+                    if (itemFavorite != null) itemFavorite.setVisible(true);
+                    isShown = true;
+                }
+            }
+        });
+
+        ivFavorite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleFavorite();
+            }
+        });
 
         rvVideos.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         rvVideos.setHasFixedSize(true);
@@ -153,11 +201,6 @@ public class MovieDetailActivity extends BaseActivity implements MovieContract.D
     }
 
     @Override
-    public Context getContext() {
-        return this;
-    }
-
-    @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
@@ -174,12 +217,17 @@ public class MovieDetailActivity extends BaseActivity implements MovieContract.D
         Parcelable reviewsState = savedInstanceState.getParcelable(PARAM_REVIEWS_STATE);
         rvReviews.getLayoutManager().onRestoreInstanceState(reviewsState);
         mReviews = savedInstanceState.getParcelableArrayList(PARAM_REVIEWS);
-        onReviewsLoaded(mReviews);
+
+        if (mReviews != null) onReviewsLoaded(mReviews);
+        else loadReviews(mMovie.getId());
 
         Parcelable videosState = savedInstanceState.getParcelable(PARAM_VIDEOS_STATE);
         rvVideos.getLayoutManager().onRestoreInstanceState(videosState);
         mVideos = savedInstanceState.getParcelableArrayList(PARAM_VIDEOS);
         onVideosLoaded(mVideos);
+
+        if (mVideos != null) onVideosLoaded(mVideos);
+        else loadVideos(mMovie.getId());
     }
 
     /*
@@ -263,5 +311,59 @@ public class MovieDetailActivity extends BaseActivity implements MovieContract.D
         mReviews = new ArrayList<>(itemList);
         rvReviews.setAdapter(new MovieReviewAdapter(mReviews));
         rvReviews.setVisibility(View.VISIBLE);
+    }
+
+    /*
+     * FAVORITE HANDLING
+     */
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_movie_detail, menu);
+        itemFavorite = menu.findItem(R.id.ac_favorite);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        boolean isFavorite = mPresenter.isFavoriteMovie(mMovie.getId());
+
+        int iconResId = isFavorite ? R.drawable.ic_star : R.drawable.ic_star_outline;
+        int textResId = isFavorite ? R.string.movie_favorite_remove : R.string.movie_favorite_set;
+
+        itemFavorite.setIcon(iconResId);
+        itemFavorite.setTitle(textResId);
+
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.ac_favorite) {
+            toggleFavorite();
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void toggleFavorite() {
+        if (mPresenter.isFavoriteMovie(mMovie.getId())) {
+            mPresenter.removeFromFavorite(mMovie.getId());
+        } else mPresenter.setAsFavorite(mMovie);
+
+        toggleFavoriteIcon();
+    }
+
+    private void toggleFavoriteIcon() {
+        boolean isFavorite = mPresenter.isFavoriteMovie(mMovie.getId());
+
+        int iconResId = isFavorite ? R.drawable.ic_star : R.drawable.ic_star_outline;
+        int textResId = isFavorite ? R.string.movie_favorite_remove : R.string.movie_favorite_set;
+
+        ivFavorite.setImageResource(iconResId);
+        ivFavorite.setContentDescription(getString(textResId));
+
+        supportInvalidateOptionsMenu();
     }
 }

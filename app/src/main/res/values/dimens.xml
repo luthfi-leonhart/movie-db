@@ -4,6 +4,7 @@
     <dimen name="layout_general_margin">16dp</dimen>
     <dimen name="layout_small_margin">8dp</dimen>
 
+    <dimen name="backdrop_height">240dp</dimen>
     <dimen name="video_thumbnail_width">154dp</dimen>
     <dimen name="video_thumbnail_height">100dp</dimen>
 

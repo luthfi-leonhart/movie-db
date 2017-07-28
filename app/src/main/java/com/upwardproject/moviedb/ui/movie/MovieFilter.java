@@ -6,5 +6,6 @@ package com.upwardproject.moviedb.ui.movie;
 
 public class MovieFilter {
     public static final int POPULAR = 1,
-                            TOP_RATED = 2;
+            TOP_RATED = 2,
+            FAVORITE = 3;
 }
